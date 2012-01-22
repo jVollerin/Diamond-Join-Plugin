@@ -1,0 +1,38 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" 
+	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+
+  <f:entry 	title="${%Projects to build once, after all downstream projects have finished}"
+  			help="/plugin/diamond/DiamondJoinTrigger/help-joinProjects.html" >
+	  <f:textbox name="joinProjects" value="${instance.joinProjectsValue}"
+               autoCompleteDelimChar="," field="joinProjects" />
+  </f:entry>
+  <f:entry title="" help="/plugin/diamond/DiamondJoinTrigger/help-evenIfDownstreamUnstable.html" >
+     <f:checkbox name="evenIfDownstreamUnstable"
+     	title="${%Trigger even if some downstream projects are unstable}"
+     	checked="${instance.threshold.toString()=='UNSTABLE'}"
+     	field="evenIfDownstreamUnstable" />
+  </f:entry>
+  <f:entry title="" help="/plugin/diamond/DiamondJoinTrigger/help-evenIfBuildStartedOnDownstream.html" >
+     <f:checkbox name="evenIfBuildStartedOnDownstream"
+     	title="${%Trigger even if build started on downstream projects}"
+     	checked="${instance.isEvenIfBuildStartedOnDownstream()}"
+     	field="evenIfBuildStartedOnDownstream" />
+  </f:entry>  
+  
+  <j:if test="${descriptor.getApplicableDescriptors().size() > 0}">
+  <f:nested title="" >
+  	<table style="margin-left:-3px;">
+   <f:optionalBlock name="diamond.postJoinActions" title="Run post build actions at join"
+   			checked="${instance.containsAnyPostBuildAction()}"
+         	help="/plugin/diamond/DiamondJoinTrigger/help-postBuildActions.html">
+        <f:entry>
+         <table>
+          <j:set var="descriptors" value="${null}"/>
+            <f:descriptorList title="Post Join Actions" descriptors="${descriptor.getApplicableDescriptors()}" field="postJoinActions" />
+         </table>
+        </f:entry>
+   </f:optionalBlock>
+   </table>
+  </f:nested>
+  </j:if>
+</j:jelly>

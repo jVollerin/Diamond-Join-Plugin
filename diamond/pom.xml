@@ -1,0 +1,219 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.jenkins-ci.plugins</groupId>
+		<artifactId>plugin</artifactId>
+		<!-- which version of Jenkins is this plugin built against? -->
+		<version>1.400</version>
+		<relativePath />
+	</parent>
+
+	<artifactId>diamond</artifactId>
+	<version>0.0.3</version>
+	<packaging>hpi</packaging>
+
+	<name>Diamond Join Plugin</name>
+	<description>Triggering a set of jobs after a group of jobs has finished (upon all project hierarchy)</description>
+	<url>https://wiki.jenkins-ci.org/display/JENKINS/Diamond+Join+Plugin</url>
+
+	<developers>
+		<developer>
+			<id>jBouyoud</id>
+			<name>Julien Bouyoud</name>
+			<email>jul86bouyd@gmail.com</email>
+		</developer>
+		<developer>
+			<id>jVollerin</id>
+			<name>Jérôme Vollerin</name>
+			<email>jerome@vollerin.fr</email>
+		</developer>
+	</developers>
+
+	<!-- <scm> -->
+	<!-- <connection>scm:git:git://github.com/jVollerin/Diamond-Join-Plugin.git</connection> -->
+	<!-- <developerConnection>scm:git:git://github.com/jVollerin/Diamond-Join-Plugin.git</developerConnection> -->
+	<!-- </scm> -->
+
+	<properties>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<project.build.outputEncoding>UTF-8</project.build.outputEncoding>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+
+	<!-- get every artifact through maven.glassfish.org, which proxies all the 
+		artifacts that we need -->
+	<repositories>
+		<repository>
+			<id>m.g.o-public</id>
+			<url>http://maven.glassfish.org/content/groups/public/</url>
+		</repository>
+	</repositories>
+
+
+	<dependencies>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins</groupId>
+			<artifactId>parameterized-trigger</artifactId>
+			<version>2.10</version>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.jvnet.hudson.plugins</groupId>
+			<artifactId>downstream-ext</artifactId>
+			<version>1.6</version>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.jvnet.hudson.plugins</groupId>
+			<artifactId>copyarchiver</artifactId>
+			<version>0.5.1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.jvnet.hudson.main</groupId>
+					<artifactId>maven-plugin</artifactId>
+				</exclusion>
+			</exclusions>
+			<optional>true</optional>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<!-- <version>2.3.2</version> -->
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<executions>
+
+					<!-- Attention Eclipse users: if you see an error here, you have to 
+						install the M2E buildhelper plugin. -->
+					<!-- Eclipse update Sit Example : https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.14.0/N/0.14.0.201109282148/ -->
+					<execution>
+						<id>add-localizer-source-folder</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>${project.build.directory}/generated-sources/localizer</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.jenkins-ci.tools</groupId>
+										<artifactId>
+											maven-hpi-plugin
+										</artifactId>
+										<versionRange>[1.64,)</versionRange>
+										<goals>
+											<goal>apt-compile</goal>
+											<goal>insert-test</goal>
+											<goal>
+												resolve-test-dependencies
+											</goal>
+											<goal>test-hpl</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.apache.maven.plugins
+										</groupId>
+										<artifactId>
+											maven-enforcer-plugin
+										</artifactId>
+										<versionRange>[1.0,)</versionRange>
+										<goals>
+											<goal>display-info</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.codehaus.groovy.maven
+										</groupId>
+										<artifactId>gmaven-plugin</artifactId>
+										<versionRange>[1.0-rc-5,)</versionRange>
+										<goals>
+											<goal>generateTestStubs</goal>
+											<goal>testCompile</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.jvnet.localizer</groupId>
+										<artifactId>
+											maven-localizer-plugin
+										</artifactId>
+										<versionRange>[1.8,)</versionRange>
+										<goals>
+											<goal>generate</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute />
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.kohsuke</groupId>
+										<artifactId>
+											access-modifier-checker
+										</artifactId>
+										<versionRange>[1.0,)</versionRange>
+										<goals>
+											<goal>enforce</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+</project>

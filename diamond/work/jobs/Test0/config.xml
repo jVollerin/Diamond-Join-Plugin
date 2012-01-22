@@ -1,0 +1,88 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector"/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.BatchFile>
+      <command>ping -n 10 0.0.0.0 &gt; nul
+exit 0</command>
+    </hudson.tasks.BatchFile>
+  </builders>
+  <publishers>
+    <hudson.tasks.BuildTrigger>
+      <childProjects>Test1,Test-Sequential</childProjects>
+      <threshold>
+        <name>SUCCESS</name>
+        <ordinal>0</ordinal>
+        <color>BLUE</color>
+      </threshold>
+    </hudson.tasks.BuildTrigger>
+    <diamond.DiamondJoinTrigger>
+      <joinProjects>Test99</joinProjects>
+      <threshold>
+        <name>SUCCESS</name>
+        <ordinal>0</ordinal>
+        <color>BLUE</color>
+      </threshold>
+      <evenIfBuildStartedOnDownstream>true</evenIfBuildStartedOnDownstream>
+      <postJoinActions>
+        <hudson.plugins.parameterizedtrigger.BuildTrigger>
+          <configs>
+            <hudson.plugins.parameterizedtrigger.BuildTriggerConfig>
+              <configs class="java.util.Collections$EmptyList"/>
+              <projects>Test99-Param</projects>
+              <condition>UNSTABLE_OR_BETTER</condition>
+              <triggerWithNoParameters>true</triggerWithNoParameters>
+            </hudson.plugins.parameterizedtrigger.BuildTriggerConfig>
+          </configs>
+        </hudson.plugins.parameterizedtrigger.BuildTrigger>
+        <com.thalesgroup.hudson.plugins.copyarchiver.CopyArchiverPublisher>
+          <sharedDirectoryPath>C:\tmp\test${BUILD_ID}</sharedDirectoryPath>
+          <flatten>false</flatten>
+          <deleteShared>true</deleteShared>
+          <archivedJobList>
+            <com.thalesgroup.hudson.plugins.copyarchiver.ArchivedJobEntry>
+              <jobName>Test0</jobName>
+              <pattern>../nextBuildNumber</pattern>
+              <excludes></excludes>
+            </com.thalesgroup.hudson.plugins.copyarchiver.ArchivedJobEntry>
+          </archivedJobList>
+        </com.thalesgroup.hudson.plugins.copyarchiver.CopyArchiverPublisher>
+      </postJoinActions>
+    </diamond.DiamondJoinTrigger>
+    <hudson.plugins.downstream__ext.DownstreamTrigger>
+      <childProjects>Test2</childProjects>
+      <threshold>
+        <name>SUCCESS</name>
+        <ordinal>0</ordinal>
+        <color>BLUE</color>
+      </threshold>
+      <thresholdStrategy>EXACT</thresholdStrategy>
+      <onlyIfSCMChanges>false</onlyIfSCMChanges>
+    </hudson.plugins.downstream__ext.DownstreamTrigger>
+    <hudson.plugins.parameterizedtrigger.BuildTrigger>
+      <configs>
+        <hudson.plugins.parameterizedtrigger.BuildTriggerConfig>
+          <configs>
+            <hudson.plugins.parameterizedtrigger.PredefinedBuildParameters>
+              <properties>TEST=titi</properties>
+            </hudson.plugins.parameterizedtrigger.PredefinedBuildParameters>
+          </configs>
+          <projects>Test3, </projects>
+          <condition>ALWAYS</condition>
+          <triggerWithNoParameters>false</triggerWithNoParameters>
+        </hudson.plugins.parameterizedtrigger.BuildTriggerConfig>
+      </configs>
+    </hudson.plugins.parameterizedtrigger.BuildTrigger>
+  </publishers>
+  <buildWrappers/>
+</project>
